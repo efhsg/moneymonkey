@@ -1,0 +1,13 @@
+streamlit
+python-dotenv
+pymysql
+alembic
+cryptography
+ 
+#requests
+#pandas
+#yfinance
+#numpy
+#jupyterlab
+#matplotlib
+#scipy

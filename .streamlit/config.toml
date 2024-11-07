@@ -1,0 +1,20 @@
+[server]
+runOnSave = true
+maxUploadSize = 1000
+
+[client]
+showSidebarNavigation = true
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+base="light"
+primaryColor = "#005778"  
+backgroundColor = "#F8F3E8" 
+secondaryBackgroundColor = "#EBE0CE" 
+textColor = "#002B5B" 
+font = "sans serif" 
+
+[logger]
+level = "warning"
