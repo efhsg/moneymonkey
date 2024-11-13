@@ -4,6 +4,7 @@ maxUploadSize = 1000
 
 [client]
 showSidebarNavigation = true
+toolbarMode = "viewer"
 
 [browser]
 gatherUsageStats = false

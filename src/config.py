@@ -19,8 +19,12 @@ class Config:
         return self.project_root / data_dir
 
     @property
-    def logo_small_path(self):
-        return str(self.project_root / "src/img/logo_3.png")
+    def logo_path(self):
+        return str(self.project_root / "src/img/logo_4_trans.png")
+
+    @property
+    def icon_path(self):
+        return str(self.project_root / "src/img/logo_3_trans.png")
 
     @property
     def latest_migration_version(self):
