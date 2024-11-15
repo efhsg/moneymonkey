@@ -16,7 +16,7 @@ def home_page():
     with logo_col:
         logo_path = getattr(config, "logo_path", None)
         if logo_path:
-            st.image(logo_path, width=240)
+            st.image(logo_path)
         else:
             st.write("Logo not available")
 

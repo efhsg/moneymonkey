@@ -2,7 +2,7 @@
 
 
 <p align="center">
-  <img width="200" height="200" src="https://github.com/efhsg/moneymonkey/blob/master/src/img/logo_3.png">
+  <img src="https://github.com/efhsg/moneymonkey/blob/master/src/img/logo_4_trans.png">
 </p>
 
 MoneyMonkey will help you to automate fundamental analysis of your stocks.
