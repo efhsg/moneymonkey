@@ -7,3 +7,4 @@ scratch/
 logging.ini
 data/db/
 data/mysql_run/
+data/logs/

@@ -5,13 +5,11 @@ from injector import get_config, get_logger
 config = get_config()
 logger = get_logger()
 
-image = Image.open(config.icon_path)
-
 
 def setup_page(page_title="MoneyMonkey"):
     st.set_page_config(
         page_title=page_title,
-        page_icon=image,
+        page_icon=Image.open(config.icon_path),
         layout="wide",
         initial_sidebar_state="auto",
     )

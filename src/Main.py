@@ -2,7 +2,6 @@ import streamlit as st
 from injector import get_config
 from pages.utils.utils import setup_page
 
-# Load configuration
 config = get_config()
 
 
