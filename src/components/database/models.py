@@ -1,3 +1,5 @@
+import datetime
+import decimal
 from sqlalchemy import (
     Column,
     DateTime,
@@ -10,19 +12,44 @@ from sqlalchemy import (
     Numeric,
     JSON,
 )
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.orm import declarative_base, relationship, validates
+import re
 
 Base = declarative_base()
 
 
-class Sector(Base):
+class Validatable:
+    MIN_NAME_LENGTH = 2
+    MAX_NAME_LENGTH = 100
+    NAME_PATTERN = r"^[a-zA-Z0-9 `~!@#$%^&*()\-_+=\[\]{\}|\\:;\"'<>,\.\?/]+$"
+    NAME_REGEX = re.compile(NAME_PATTERN)
+
+    @validates("name")
+    def validate_name(self, key, name):
+        if len(name) > self.MAX_NAME_LENGTH:
+            raise ValueError(
+                f"Name exceeds maximum length of {self.MAX_NAME_LENGTH} characters: {name}"
+            )
+        if len(name) < self.MIN_NAME_LENGTH:
+            raise ValueError(
+                f"Name must be have a minimal length of {self.MIN_NAME_LENGTH} characters: {name}"
+            )
+        if not self.NAME_REGEX.match(name):
+            raise ValueError(
+                "Invalid name. Allowed characters include letters, digits, and most special characters found on a standard US keyboard. Received: "
+                + name
+            )
+        return name
+
+
+class Sector(Base, Validatable):
     __tablename__ = "sectors"
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(100), unique=True, nullable=False)
     industries = relationship("Industry", back_populates="sector")
 
 
-class Industry(Base):
+class Industry(Base, Validatable):
     __tablename__ = "industries"
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(100), unique=True, nullable=False)
@@ -31,7 +58,7 @@ class Industry(Base):
     stocks = relationship("Stock", back_populates="industry")
 
 
-class MetricName(Base):
+class MetricName(Base, Validatable):
     __tablename__ = "metric_names"
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), unique=True, nullable=False)
@@ -47,11 +74,13 @@ class Stock(Base):
     market_cap = Column(Numeric(precision=20, scale=2), nullable=True)
     price = Column(Numeric(precision=15, scale=4), nullable=False)
     created_at = Column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
+        DateTime(timezone=True),
+        default=datetime.datetime.now(datetime.timezone.utc),
+        nullable=False,
     )
     updated_at = Column(
         DateTime(timezone=True),
-        server_default=func.now(),
+        default=datetime.datetime.now(datetime.timezone.utc),
         onupdate=func.now(),
         nullable=False,
     )
@@ -76,7 +105,9 @@ class FinancialMetric(Base):
     metric_name_id = Column(Integer, ForeignKey("metric_names.id"), nullable=False)
     metric_value = Column(Numeric(precision=15, scale=2), nullable=False)
     date_recorded = Column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
+        DateTime(timezone=True),
+        default=datetime.datetime.now(datetime.timezone.utc),
+        nullable=False,
     )
     stock = relationship("Stock", back_populates="financial_metrics")
     metric_name = relationship("MetricName", back_populates="financial_metrics")
@@ -85,6 +116,16 @@ class FinancialMetric(Base):
         CheckConstraint("metric_value >= 0", name="check_metric_value_non_negative"),
     )
 
+    @validates("metric_value")
+    def validate_metric_value(self, key, metric_value):
+        try:
+            rounded_value = round(decimal.Decimal(metric_value), 2)
+        except decimal.InvalidOperation:
+            raise ValueError(f"Invalid metric value: {metric_value}")
+        if rounded_value < 0:
+            raise ValueError(f"Metric value must be non-negative: {metric_value}")
+        return rounded_value
+
 
 class DividendYield(Base):
     __tablename__ = "dividend_yields"
@@ -92,7 +133,9 @@ class DividendYield(Base):
     stock_id = Column(Integer, ForeignKey("stocks.id"), nullable=False)
     yield_value = Column(Numeric(precision=10, scale=4), nullable=False)
     date_recorded = Column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
+        DateTime(timezone=True),
+        default=datetime.datetime.now(datetime.timezone.utc),
+        nullable=False,
     )
     stock = relationship("Stock", back_populates="dividend_yields")
 
@@ -107,12 +150,14 @@ class StockPriceHistory(Base):
     stock_id = Column(Integer, ForeignKey("stocks.id"), nullable=False)
     price = Column(Numeric(precision=15, scale=4), nullable=False)
     date_recorded = Column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
+        DateTime(timezone=True),
+        default=datetime.datetime.now(datetime.timezone.utc),
+        nullable=False,
     )
     stock = relationship("Stock", back_populates="price_history")
 
 
-class DataSource(Base):
+class DataSource(Base, Validatable):
     __tablename__ = "data_sources"
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(100), unique=True, nullable=False)

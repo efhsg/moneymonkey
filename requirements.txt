@@ -3,6 +3,7 @@ python-dotenv
 pymysql
 alembic
 cryptography
+pytest
  
 #requests
 #pandas

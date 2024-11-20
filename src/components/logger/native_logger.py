@@ -48,6 +48,6 @@ class NativeLogger(Logger):
             cls._logger = True
 
     @classmethod
-    def get_logger(cls, name="docuchat") -> logging.Logger:
+    def get_logger(cls, name="moneymonkey") -> logging.Logger:
         cls._ensure_configured()
         return logging.getLogger(name)
