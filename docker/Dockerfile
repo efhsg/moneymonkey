@@ -15,6 +15,10 @@ WORKDIR /app
 # Copy the requirements file into the container
 COPY requirements.txt /app/requirements.txt
 
+# Git (dev container)
+RUN apt-get update && \
+    apt-get install -y git  
+
 # Install requirements
 RUN pip install -r requirements.txt
 
